@@ -27,12 +27,13 @@ public class MySecurityConfig {
     {
         return new BCryptPasswordEncoder();
     }
+    /*
 
     @Bean
     public UserDetailsService userDetailsService()
     {
         return new CustomUserLoginService();
-    }
+    }*/
 
     @Bean
         public SecurityFilterChain configure(HttpSecurity httpSecurity)throws Exception {
