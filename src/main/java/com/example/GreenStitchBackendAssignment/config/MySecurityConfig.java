@@ -33,26 +33,6 @@ public class MySecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserLoginService();
-    }
-     */
-
-    /*
-     * @Bean
-     * public SecurityFilterChain configure(HttpSecurity httpSecurity)throws
-     * Exception {
-     * httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers(
-     * "/register").permitAll()
-     * .anyRequest().authenticated().
-     * and().formLogin();
-     * 
-     * return httpSecurity.build();
-     * }
-     */
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
 
@@ -62,18 +42,6 @@ public class MySecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
 
     }
-
-    /*
-     * @Bean
-     * public AuthenticationProvider authenticationProvider()
-     * {
-     * DaoAuthenticationProvider authenticationProvider = new
-     * DaoAuthenticationProvider();
-     * authenticationProvider.setUserDetailsService(userDetailsService());
-     * authenticationProvider.setPasswordEncoder(passwordEncoder());
-     * return authenticationProvider();
-     * }
-     */
 
     @Bean
     public AuthenticationManager getAuthenticationManager(UserDetailsService userDetailsService,
