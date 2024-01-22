@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 import com.example.GreenStitchBackendAssignment.entity.LoginDetails;
 import com.example.GreenStitchBackendAssignment.repository.LoginDetailsRepository;
 
+
+/**
+ * Class which provides the username, password and role dynamically to check if the user exists or not 
+ */
+
 @Component
 public class CustomUserLoginService implements UserDetailsService {
     @Autowired
@@ -20,8 +25,6 @@ public class CustomUserLoginService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         LoginDetails loginDetails = loginDetailsRepository.getLoginDetailsByUserName(username);
-        System.out.println(username);
-        System.out.println(loginDetails.getUserName());
         return org.springframework.security.core.userdetails.User.builder().username(loginDetails.getUserName())
         .password(passwordEncoder.encode(loginDetails.getPassword())).authorities("USER").build();
     }

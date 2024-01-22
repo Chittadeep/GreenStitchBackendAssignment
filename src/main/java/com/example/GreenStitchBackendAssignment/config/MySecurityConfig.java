@@ -1,5 +1,6 @@
 package com.example.GreenStitchBackendAssignment.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,53 +18,69 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.GreenStitchBackendAssignment.service.CustomUserLoginService;
 
 @Configuration
 public class MySecurityConfig {
 
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
     @Bean
-    public PasswordEncoder passwordEncoder()
-    {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /*
     @Bean
-    public UserDetailsService userDetailsService()
-    {
+    public UserDetailsService userDetailsService() {
         return new CustomUserLoginService();
     }
+     */
+
+    /*
+     * @Bean
+     * public SecurityFilterChain configure(HttpSecurity httpSecurity)throws
+     * Exception {
+     * httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers(
+     * "/register").permitAll()
+     * .anyRequest().authenticated().
+     * and().formLogin();
+     * 
+     * return httpSecurity.build();
+     * }
+     */
 
     @Bean
-        public SecurityFilterChain configure(HttpSecurity httpSecurity)throws Exception {
-        httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/register").permitAll()
-        .requestMatchers("/hello").hasAnyAuthority("USER")
-        .requestMatchers("/h2-console").permitAll()
-        .requestMatchers("/h2-console/**").permitAll().anyRequest().authenticated().
-        and().formLogin();
+    public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
 
-        return httpSecurity.build();
-        }
+        return httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/register", "/login").permitAll()
+                .anyRequest().authenticated().and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
 
-        /*
-    @Bean
-    public AuthenticationProvider authenticationProvider()
-    {
-        DaoAuthenticationProvider authenticationProvider =  new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider();
     }
-    */
+
+    /*
+     * @Bean
+     * public AuthenticationProvider authenticationProvider()
+     * {
+     * DaoAuthenticationProvider authenticationProvider = new
+     * DaoAuthenticationProvider();
+     * authenticationProvider.setUserDetailsService(userDetailsService());
+     * authenticationProvider.setPasswordEncoder(passwordEncoder());
+     * return authenticationProvider();
+     * }
+     */
 
     @Bean
-        public AuthenticationManager getAuthenticationManager(UserDetailsService userDetailsService,
-                        PasswordEncoder passwordEncoder, HttpSecurity httpSecurity) throws Exception {
-                AuthenticationManagerBuilder builder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
-                builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-                return builder.build();
-        }
+    public AuthenticationManager getAuthenticationManager(UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder, HttpSecurity httpSecurity) throws Exception {
+        AuthenticationManagerBuilder builder = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        return builder.build();
+    }
 
-        
 }
