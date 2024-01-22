@@ -38,8 +38,7 @@ public class MySecurityConfig {
         public SecurityFilterChain configure(HttpSecurity httpSecurity)throws Exception {
         httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/register").permitAll()
         .requestMatchers("/hello").hasAnyAuthority("USER")
-        .requestMatchers("/h2-console").permitAll()
-        .requestMatchers("/h2-console/**").permitAll().anyRequest().authenticated().
+        .anyRequest().authenticated().
         and().formLogin();
 
         return httpSecurity.build();
